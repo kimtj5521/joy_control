@@ -16,15 +16,11 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
     SetPosition.msg
-    SyncSetPosition.msg
-    BulkSetItem.msg
 )
 
 add_service_files(
   FILES
     GetPosition.srv
-    SyncGetPosition.srv
-    BulkGetItem.srv
 )
 
 generate_messages(

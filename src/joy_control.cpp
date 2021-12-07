@@ -95,6 +95,16 @@ void control_Joy::callback_joy(const sensor_msgs::Joy::ConstPtr& msg)
     }    
 }
 
+void control_Joy::callback_speed(const std_msgs::Float64::ConstPtr& msg)
+{
+
+}
+
+void control_Joy::callback_steering(const std_msgs::Float64::ConstPtr& msg)
+{
+
+}
+
 void control_Joy::speed_control()
 {
     m_dLinear_x_vel = m_linear_x_stick * 5.0;
@@ -117,6 +127,9 @@ int main(int argc, char **argv)
     control_Joy c_joy;
 
     ros::Subscriber sub_Joy = nh.subscribe<sensor_msgs::Joy>("joy", 100, &control_Joy::callback_joy, &c_joy);
+    ros::Subscriber sub_cmd_scooter_speed = nh.subscribe<std_msgs::Float64>("/cmd_scooter_speed", 10, &control_Joy::callback_speed, &c_joy);
+    ros::Subscriber sub_cmd_scooter_steering = nh.subscribe<std_msgs::Float64>("/cmd_scooter_steering", 10, &control_Joy::callback_steering, &c_joy);
+
     ros::Publisher pub_velocity = nh.advertise<std_msgs::Float32>("/velocity", 10);
     ros::Publisher pub_steering = nh.advertise<dynamixel_sdk_examples::SetPosition>("/set_position", 10);
     c_joy.pub_make_path = nh.advertise<std_msgs::String>("/make_path", 10);
@@ -124,6 +137,9 @@ int main(int argc, char **argv)
     c_joy.pub_tracking = nh.advertise<std_msgs::String>("/tracking", 10);
     c_joy.pub_gps_init = nh.advertise<std_msgs::String>("/init", 10);
 
+    nh.getParam("/max_speed", c_joy.max_speed);
+    nh.getParam("/max_steering", c_joy.max_steering);
+    
     ros::Rate loop_rate(10);
 
     while(ros::ok()){

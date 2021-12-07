@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Float64.h>
 
 #include "std_msgs/String.h"
 #include "dynamixel_sdk_examples/GetPosition.h"
@@ -18,6 +19,8 @@ namespace joy_control
     {
     public:
         void callback_joy(const sensor_msgs::Joy::ConstPtr& msg);
+        void callback_speed(const std_msgs::Float64::ConstPtr& msg);
+        void callback_steering(const std_msgs::Float64::ConstPtr& msg);
 
         const int ON = 1;
         const int OFF = 0;
@@ -56,6 +59,9 @@ namespace joy_control
         ros::Publisher pub_make_path;
         ros::Publisher pub_gps_init;
         std_msgs::String tmp_msg;
+
+        float max_speed;
+        int max_steering; 
 
     private:
         void speed_control();
