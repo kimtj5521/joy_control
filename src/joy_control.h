@@ -61,7 +61,7 @@ namespace joy_control
         std_msgs::String tmp_msg;
 
         float max_speed;
-        int max_steering; 
+        float max_steering; 
 
     private:
         void speed_control();

@@ -16,7 +16,7 @@ control_Joy::control_Joy()
     m_linear_x_stick = 0.0;
     m_angular_z_stick = 0.0;
 
-    m_bFlagStart = false;
+    m_bFlagStart = true;
     m_bFlagMakePath = false;
     m_bFlagTracking = false;
    
@@ -91,23 +91,32 @@ void control_Joy::callback_joy(const sensor_msgs::Joy::ConstPtr& msg)
         m_Scooter_Steering.position = (int)m_d_steer_angle;
     }
     else{
-        m_Scooter_Speed.data = 0.0;
+        //m_Scooter_Speed.data = 0.0;
+        m_Scooter_Speed.data = m_dLinear_x_vel;
+        m_Scooter_Steering.id = 1;
+        m_Scooter_Steering.position = (int)m_d_steer_angle * 3000;
     }    
 }
 
 void control_Joy::callback_speed(const std_msgs::Float64::ConstPtr& msg)
 {
-
+    m_dLinear_x_vel = (float)msg->data;
 }
 
 void control_Joy::callback_steering(const std_msgs::Float64::ConstPtr& msg)
 {
-
+    m_d_steer_angle = (float)msg->data;
+    if (m_d_steer_angle > 20.0) {
+        m_d_steer_angle = 20.0;
+    }
+    else if (m_d_steer_angle < -20.0){
+        m_d_steer_angle = -20.0;
+    }
 }
 
 void control_Joy::speed_control()
 {
-    m_dLinear_x_vel = m_linear_x_stick * 5.0;
+    m_dLinear_x_vel = m_linear_x_stick * max_speed;
     if(m_dLinear_x_vel < 0)
     {
         m_dLinear_x_vel = 0.0;
@@ -116,7 +125,7 @@ void control_Joy::speed_control()
 
 void control_Joy::steering_control()
 {
-    m_d_steer_angle = m_angular_z_stick*60000.0;
+    m_d_steer_angle = m_angular_z_stick * 3000.0 * max_steering;
 }
 
 int main(int argc, char **argv)
