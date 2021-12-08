@@ -25,6 +25,7 @@ namespace joy_control
         const int ON = 1;
         const int OFF = 0;
 
+        ///////// for ros melodic joy package /////////
         // ps4 dualshock joystick button mapping
         const int X = 1;
         const int O = 2;
@@ -47,6 +48,30 @@ namespace joy_control
         const double Right_stick_Left_and_Right = 2;
         const double Right_stick_Up_and_Down = 5;
         const double Right_trigger = 4;
+
+        ///////// for ros kinetic joy package /////////
+        // ps4 dualshock joystick button mapping
+        // const int X = 0;
+        // const int O = 1;
+        // const int triangle = 2;
+        // const int square = 3;
+        // const int L1_Button = 4;
+        // const int R1_Button = 5;
+        // const int L2_Trigger = 6;
+        // const int R2_Trigger = 7;
+        // const int SHARE_button = 8;
+        // const int Option_button = 9;
+        // const int PS_button = 10;
+        // const int Button_stick_Left_push = 11;
+        // const int Button_stick_Right_push = 12;
+
+        // // ps4 dualshock joystick axis mapping
+        // const double Left_stick_Left_and_Right = 0;
+        // const double Left_stick_Up_and_Down = 1;
+        // const double Left_trigger = 2;
+        // const double Right_stick_Left_and_Right = 3;
+        // const double Right_stick_Up_and_Down = 4;
+        // const double Right_trigger = 5;
 
         control_Joy();
         ~control_Joy();
