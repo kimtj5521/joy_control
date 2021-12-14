@@ -27,6 +27,8 @@ control_Joy::control_Joy()
     std::stringstream ss;
     ss << "hello";
     tmp_msg.data = ss.str();
+
+    m_L1_button = 0;
 }
 
 control_Joy::~control_Joy()
@@ -40,6 +42,7 @@ void control_Joy::callback_joy(const sensor_msgs::Joy::ConstPtr& msg)
     m_tracking = msg->buttons[O];
     m_gps_init = msg->buttons[X];
     m_start = msg->buttons[PS_button];
+    m_L1_button = msg->buttons[L1_Button];
 
     m_linear_x_stick = msg->axes[Left_stick_Up_and_Down];
     m_angular_z_stick = msg->axes[Right_stick_Left_and_Right];
@@ -82,20 +85,20 @@ void control_Joy::callback_joy(const sensor_msgs::Joy::ConstPtr& msg)
         std::cout << "*** Manual control OFF ***" << std::endl;
     }
 
-    if(m_bFlagStart == true){
-        speed_control();
-        steering_control();
+    // if(m_bFlagStart == true){
+    //     speed_control();
+    //     steering_control();
 
-        m_Scooter_Speed.data = m_dLinear_x_vel;
-        m_Scooter_Steering.id = 1;
-        m_Scooter_Steering.position = (int)m_d_steer_angle;
-    }
-    else{
-        //m_Scooter_Speed.data = 0.0;
-        m_Scooter_Speed.data = m_dLinear_x_vel;
-        m_Scooter_Steering.id = 1;
-        m_Scooter_Steering.position = (int)m_d_steer_angle * 3000;
-    }    
+    //     m_Scooter_Speed.data = m_dLinear_x_vel;
+    //     m_Scooter_Steering.id = 1;
+    //     m_Scooter_Steering.position = (int)m_d_steer_angle;
+    // }
+    // else{
+    //     //m_Scooter_Speed.data = 0.0;
+    //     m_Scooter_Speed.data = m_dLinear_x_vel;
+    //     m_Scooter_Steering.id = 1;
+    //     m_Scooter_Steering.position = (int)m_d_steer_angle * 3000;
+    // }    
 }
 
 void control_Joy::callback_speed(const std_msgs::Float64::ConstPtr& msg)
@@ -128,6 +131,42 @@ void control_Joy::steering_control()
     m_d_steer_angle = m_angular_z_stick * 3000.0 * max_steering;
 }
 
+void control_Joy::run()
+{
+    if(m_bFlagStart == true){
+        speed_control();
+        steering_control();
+
+        m_Scooter_Speed.data = m_dLinear_x_vel;
+        m_Scooter_Steering.id = 1;
+        m_Scooter_Steering.position = (int)m_d_steer_angle;
+    }
+    else{
+        if(m_L1_button == ON){
+            m_Scooter_Speed.data = m_dLinear_x_vel + m_linear_x_stick * max_speed;
+            if(m_Scooter_Speed.data > max_speed){
+                m_Scooter_Speed.data = max_speed;
+            }
+            else if(m_Scooter_Speed.data < 0){
+                m_Scooter_Speed.data = 0 ;
+            }
+            m_Scooter_Steering.id = 1;
+            m_Scooter_Steering.position = (int)m_d_steer_angle * 3000 + m_angular_z_stick * 3000.0 * max_steering;
+            if (m_Scooter_Steering.position > 60000){
+                m_Scooter_Steering.position = 60000;
+            }
+            else if(m_Scooter_Steering.position < -60000){
+                m_Scooter_Steering.position = -60000;
+            }
+        }
+        else {
+            m_Scooter_Speed.data = m_dLinear_x_vel;
+            m_Scooter_Steering.id = 1;
+            m_Scooter_Steering.position = (int)m_d_steer_angle * 3000;
+        }
+    }    
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "joy_control");
@@ -153,6 +192,7 @@ int main(int argc, char **argv)
 
     while(ros::ok()){
         ros::spinOnce();
+        c_joy.run();
 
         pub_velocity.publish(c_joy.m_Scooter_Speed);
         pub_steering.publish(c_joy.m_Scooter_Steering);
